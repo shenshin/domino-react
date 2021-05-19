@@ -1,32 +1,35 @@
-import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import Tile from './Tile';
+import { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import Tile from './Tile'
 import {
   restartGame,
   putTileToStock,
   drawTileToAI,
   drawTileToUser,
   drawTileToPlayline,
-} from '../redux/dominoSlice';
+} from '../redux/dominoSlice'
+import Container from './StockContainer'
 
-const dispatchConsequently = ({ dispatch, action, steps, delay }) => {
-  let count = 0;
+const dispatchConsequently = ({
+  dispatch, action, steps, delay,
+}) => {
+  let count = 0
   return new Promise((resolve) => {
     const interval = setInterval(() => {
       if (count < steps) {
-        count += 1;
-        dispatch(action());
+        count += 1
+        dispatch(action())
       } else {
-        clearInterval(interval);
-        resolve();
+        clearInterval(interval)
+        resolve()
       }
-    }, delay);
-  });
-};
+    }, delay)
+  })
+}
 
 const Stock = () => {
-  const dispatch = useDispatch();
-  const tiles = useSelector((state) => state.domino.stock);
+  const dispatch = useDispatch()
+  const tiles = useSelector((state) => state.domino.stock)
 
   useEffect(() => {
     (async () => {
@@ -35,29 +38,29 @@ const Stock = () => {
         dispatch,
         action: putTileToStock,
         steps: 28,
-        delay: 40,
-      });
+        delay: 1000,
+      })
       await dispatchConsequently({
         dispatch,
         action: drawTileToAI,
         steps: 6,
-        delay: 80,
-      });
+        delay: 1000,
+      })
       await dispatchConsequently({
         dispatch,
         action: drawTileToUser,
         steps: 6,
-        delay: 80,
-      });
-      dispatch(drawTileToPlayline());
-    })();
-  }, [dispatch]);
+        delay: 1000,
+      })
+      dispatch(drawTileToPlayline())
+    })()
+  }, [dispatch])
 
   return (
     <div>
       <h5>Game Stock</h5>
       {tiles?.length > 0 ? (
-        <div>
+        <Container>
           {tiles?.map((tile, i) => (
             <Tile
               key={tile.id}
@@ -67,12 +70,12 @@ const Stock = () => {
               stock
             />
           ))}
-        </div>
+        </Container>
       ) : (
         <p>is empty</p>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Stock;
+export default Stock

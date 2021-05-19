@@ -1,8 +1,8 @@
-import User from './components/User';
-import AIPlayer from './components/AIPlayer';
-import Playline from './components/Playline';
-import Stock from './components/Stock';
-import { useSelector } from 'react-redux';
+import { useSelector } from 'react-redux'
+import User from './components/User'
+import AIPlayer from './components/AIPlayer'
+import Playline from './components/Playline'
+import Stock from './components/Stock'
 
 const App = () => {
   const { winner } = useSelector((state) => state.domino);
@@ -19,4 +19,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default App

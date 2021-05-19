@@ -1,25 +1,27 @@
-import Tile from './Tile';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux'
+import Tile from './Tile'
 import {
   userDrawsTile,
   userMissesMove,
   aiMakesMove,
-} from '../redux/dominoSlice';
+} from '../redux/dominoSlice'
+// import styled from 'styled-components';
+import StockContainer from './StockContainer'
 
 const User = () => {
   const {
     players: [user],
     stock,
     winner,
-  } = useSelector((state) => state.domino);
-  const dispatch = useDispatch();
+  } = useSelector((state) => state.domino)
+  const dispatch = useDispatch()
   const handleDrawTile = () => {
-    dispatch(userDrawsTile());
-  };
+    dispatch(userDrawsTile())
+  }
   const handleMissMove = () => {
-    dispatch(userMissesMove());
-    dispatch(aiMakesMove());
-  };
+    dispatch(userMissesMove())
+    dispatch(aiMakesMove())
+  }
   return (
     <div>
       <h5>Your Stock</h5>
@@ -35,13 +37,13 @@ const User = () => {
         </button>
       </div>
       <p>Drop a tile and drag it to the Playline</p>
-      <div>
+      <StockContainer>
         {user?.stock?.map((tile) => (
           <Tile key={tile.id} tile={tile} draggable={!winner} />
         ))}
-      </div>
+      </StockContainer>
     </div>
-  );
-};
+  )
+}
 
-export default User;
+export default User

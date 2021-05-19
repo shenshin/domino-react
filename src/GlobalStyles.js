@@ -1,10 +1,10 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from 'styled-components'
 
-const textPrimary = '#e6e6e6';
-const textSecondary = '#b4b4b4';
-const background = '#303030';
+const textPrimary = '#e6e6e6'
+const textSecondary = '#b4b4b4'
+const background = '#303030'
 
-export const GlobalStyles = createGlobalStyle`
+const GlobalStyles = createGlobalStyle`
   * {
     margin: 0;
     padding: 0;
@@ -29,6 +29,7 @@ export const GlobalStyles = createGlobalStyle`
   }
   button {
     padding: 3px 9px;
+    margin-bottom: 0.5rem;
     font-weight: 300;
     text-transform: uppercase;
     letter-spacing: 0.02rem;
@@ -46,5 +47,5 @@ export const GlobalStyles = createGlobalStyle`
       background-color: #4c4c4c;
     }
   }
-`;
-export default GlobalStyles;
+`
+export default GlobalStyles

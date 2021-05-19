@@ -5,7 +5,7 @@
 export function shuffle(elements) {
   for (let i = elements.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * i);
-    [elements[i], elements[j]] = [elements[j], elements[i]];
+    [elements[i], elements[j]] = [elements[j], elements[i]]
   }
 }
 
@@ -18,20 +18,18 @@ export function shuffle(elements) {
  */
 export function combinationsWithRepetition(elements, taking) {
   if (taking <= 0 || elements.length <= 0) {
-    return [];
+    return []
   }
   if (taking === 1) {
-    return elements.map((e) => [e]);
+    return elements.map((e) => [e])
   }
-  let combinations = [];
-  let reducedElements = elements;
+  let combinations = []
+  let reducedElements = elements
   elements.forEach((element) => {
     combinations = combinations.concat(
-      combinationsWithRepetition(reducedElements, taking - 1).map((e) =>
-        [element].concat(e),
-      ),
-    );
-    reducedElements = reducedElements.slice(1);
-  });
-  return combinations;
+      combinationsWithRepetition(reducedElements, taking - 1).map((e) => [element].concat(e)),
+    )
+    reducedElements = reducedElements.slice(1)
+  })
+  return combinations
 }

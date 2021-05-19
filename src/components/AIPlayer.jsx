@@ -1,24 +1,26 @@
-import { useEffect } from 'react';
-import Tile from './Tile';
-import { useSelector, useDispatch } from 'react-redux';
-import { drawTileToAI, aiMakesMove } from '../redux/dominoSlice';
+import { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+// import styled, { css } from 'styled-components';
+import Tile from './Tile'
+import { drawTileToAI, aiMakesMove } from '../redux/dominoSlice'
+import Container from './StockContainer'
 
 const AIPlayer = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
   const {
     players: [, aiPlayer],
-  } = useSelector((state) => state.domino);
+  } = useSelector((state) => state.domino)
   // untill aiPlayer.missedLastMove is not 0, every 'delay'
-  const delay = 600; // ms
+  const delay = 600 // ms
   // milliseconds dispatch draw tile
   useEffect(() => {
     if (aiPlayer?.missedLastMove > 0) {
       setTimeout(() => {
-        dispatch(drawTileToAI());
-        dispatch(aiMakesMove());
-      }, delay);
+        dispatch(drawTileToAI())
+        dispatch(aiMakesMove())
+      }, delay)
     }
-  }, [aiPlayer?.missedLastMove, dispatch]);
+  }, [aiPlayer?.missedLastMove, dispatch])
   return (
     <div>
       {aiPlayer?.stock?.length > 0 ? (
@@ -27,17 +29,17 @@ const AIPlayer = () => {
           {aiPlayer?.missedLastMove > 0 && (
             <p>{`missed move ${aiPlayer?.missedLastMove}`}</p>
           )}
-          <div>
+          <Container>
             {aiPlayer?.stock?.map((tile) => (
               <Tile key={tile.id} tile={tile} />
             ))}
-          </div>
+          </Container>
         </div>
       ) : (
         <p>AI&apos;s stock is empty</p>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default AIPlayer;
+export default AIPlayer

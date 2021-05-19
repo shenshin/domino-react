@@ -1,12 +1,13 @@
-import Tile from './Tile';
-import { useSelector } from 'react-redux';
+import { useSelector } from 'react-redux'
+import Tile from './Tile'
+import Container from './StockContainer'
 
 const PlayLine = () => {
-  const playline = useSelector((state) => state.domino.playline);
+  const playline = useSelector((state) => state.domino.playline)
   return (
     <div>
       <h5>Play Line</h5>
-      <div>
+      <Container>
         {playline?.map((tile, i, a) => (
           <Tile
             tile={tile}
@@ -16,9 +17,9 @@ const PlayLine = () => {
             last={i === a.length - 1}
           />
         ))}
-      </div>
+      </Container>
     </div>
-  );
-};
+  )
+}
 
-export default PlayLine;
+export default PlayLine

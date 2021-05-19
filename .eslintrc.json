@@ -1,0 +1,30 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "plugin:react/recommended",
+        "airbnb",
+        "react-app",
+        "react-app/jest"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+      "no-param-reassign": 0,
+      "semi": 0,
+      "react/react-in-jsx-scope": 0,
+      "react/button-has-type": 0,
+      "react/prop-types": 0,
+      "no-nested-ternary": 0
+    }
+}

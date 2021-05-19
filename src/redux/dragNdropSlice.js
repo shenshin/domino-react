@@ -1,9 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit'
 
 const tileSlice = createSlice({
   name: 'tile',
   initialState: {
     draggedTile: null,
+    stockPosition: null,
   },
   reducers: {
     startDrag: (state, { payload: { tile } }) => {
@@ -12,8 +13,11 @@ const tileSlice = createSlice({
     stopDrag: (state) => {
       state.draggedTile = null;
     },
+    setStockPosition: (state, { payload: { position } }) => {
+      state.stockPosition = position;
+    },
   },
-});
+})
 
-export const { startDrag, stopDrag } = tileSlice.actions;
-export default tileSlice.reducer;
+export const { startDrag, stopDrag, setStockPosition } = tileSlice.actions
+export default tileSlice.reducer

@@ -1,11 +1,11 @@
-import { configureStore } from '@reduxjs/toolkit';
-import dominoSlice from './dominoSlice';
-import dragNdropSlice from './dragNdropSlice';
+import { configureStore } from '@reduxjs/toolkit'
+import dominoSlice from './dominoSlice'
+import dragNdropSlice from './dragNdropSlice'
 
-export const store = configureStore({
+const store = configureStore({
   reducer: {
     domino: dominoSlice,
     dragNdrop: dragNdropSlice,
   },
 });
-export default store;
+export default store
