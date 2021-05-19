@@ -9,10 +9,8 @@ const App = () => {
   return (
     <>
       {winner && <h2>{`Game over! The winner today is ${winner?.name}`}</h2>}
-      <div>
-        <AIPlayer />
-      </div>
       <Stock />
+      <AIPlayer />
       <Playline />
       <User />
     </>

@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 import Tile from './Tile'
 import {
-  userDrawsTile,
+  drawTileToUser,
   userMissesMove,
   aiMakesMove,
 } from '../redux/dominoSlice'
@@ -16,7 +16,7 @@ const User = () => {
   } = useSelector((state) => state.domino)
   const dispatch = useDispatch()
   const handleDrawTile = () => {
-    dispatch(userDrawsTile())
+    dispatch(drawTileToUser())
   }
   const handleMissMove = () => {
     dispatch(userMissesMove())

@@ -6,6 +6,12 @@ import {
   getNumbers,
 } from '../util/tileOperations'
 
+function moveTile({ from, to }) {
+  if (from.length > 0) {
+    to.push(from.splice(from.length - 1)[0])
+  }
+}
+
 const initialState = {
   initialStock: [],
   stock: [],
@@ -43,11 +49,7 @@ const dominoSlice = createSlice({
         stock: [],
       }))
     },
-    putTileToStock: (state) => {
-      if (state.initialStock.length > 0) {
-        state.stock.push(state.initialStock.splice(0, 1)[0])
-      }
-    },
+
     setGameStockCoords: (state, { payload: { tile, lastCoords } }) => {
       const tileInStock = state.stock.find((t) => t.id === tile.id)
       if (tileInStock) {
@@ -55,23 +57,10 @@ const dominoSlice = createSlice({
       }
     },
 
-    drawTileToAI: (state) => {
-      if (state.stock.length > 0) {
-        state.players[1].stock.push(state.stock.splice(state.stock.length - 1)[0])
-      }
-    },
-    drawTileToUser: (state) => {
-      if (state.stock.length > 0) {
-        state.players[0].stock.push(
-          state.stock.splice(state.stock.length - 1)[0],
-        );
-      }
-    },
-    drawTileToPlayline: (state) => {
-      if (state.stock.length > 0) {
-        state.playline.push(state.stock.splice(state.stock.length - 1)[0])
-      }
-    },
+    putTileToStock: (state) => moveTile({ from: state.initialStock, to: state.stock }),
+    drawTileToAI: (state) => moveTile({ from: state.stock, to: state.players[1].stock }),
+    drawTileToPlayline: (state) => moveTile({ from: state.stock, to: state.playline }),
+    drawTileToUser: (state) => moveTile({ from: state.stock, to: state.players[0].stock }),
 
     userMakesMove: (state, { payload: { tile, position } }) => {
       // find a player with matched tile
@@ -87,19 +76,7 @@ const dominoSlice = createSlice({
       if (user.stock.length === 0) {
         // game over
         state.winner = user
-      } else if (state.stock.length > 0) {
-        // add new tile from stock
-        user.stock.push(state.stock.splice(state.stock.length - 1)[0])
-      }
-    },
-
-    userDrawsTile: (state) => {
-      if (state.stock.length > 0) {
-        state.players[0].stock.push(
-
-          state.stock.splice(state.stock.length - 1)[0],
-        )
-      }
+      } else moveTile({ from: state.stock, to: user.stock })
     },
 
     userMissesMove: (state) => {
@@ -120,10 +97,7 @@ const dominoSlice = createSlice({
         if (ai.stock.length === 0) {
           // game over
           state.winner = ai
-        } else if (state.stock.length > 0) {
-          // add new tile from stock
-          ai.stock.push(state.stock.splice(state.stock.length - 1)[0])
-        }
+        } else moveTile({ from: state.stock, to: ai.stock })
       } else {
         ai.missedLastMove += 1
       }
@@ -141,7 +115,6 @@ export const {
 
   userMakesMove,
   aiMakesMove,
-  userDrawsTile,
   userMissesMove,
 } = dominoSlice.actions
 export default dominoSlice.reducer

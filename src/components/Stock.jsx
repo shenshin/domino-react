@@ -38,19 +38,19 @@ const Stock = () => {
         dispatch,
         action: putTileToStock,
         steps: 28,
-        delay: 1000,
+        delay: 300,
       })
       await dispatchConsequently({
         dispatch,
         action: drawTileToAI,
         steps: 6,
-        delay: 1000,
+        delay: 1300,
       })
       await dispatchConsequently({
         dispatch,
         action: drawTileToUser,
         steps: 6,
-        delay: 1000,
+        delay: 1300,
       })
       dispatch(drawTileToPlayline())
     })()

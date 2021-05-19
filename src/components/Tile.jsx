@@ -1,4 +1,6 @@
-import { useEffect, useCallback, useState } from 'react'
+import {
+  useEffect, useRef,
+} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { motion, useAnimation } from 'framer-motion'
@@ -12,7 +14,6 @@ import { getNumbers } from '../util/tileOperations'
 
 const DominoTile = styled(motion.div)`
   margin: 2px;
-  line-height: ${({ isHorizontal }) => (isHorizontal ? css`0.5` : css`0.9`)};
   font-size: ${({ size }) => (size === 'sm' ? css`2rem` : size === 'md' ? css`3.5rem` : css`5rem`)};
   ${({ draggable }) => draggable
     && css`
@@ -40,60 +41,44 @@ const Tile = ({
   // in order styled components to work
   className,
 }) => {
-  const controls = useAnimation()
-
+  const ref = useRef()
   const dispatch = useDispatch()
   const { draggedTile } = useSelector((state) => state.dragNdrop)
   const { winner } = useSelector((state) => state.domino)
-  const [coords, setCoords] = useState(null)
-  const ref = useCallback((node) => {
-    if (node) {
-      setCoords(node.getBoundingClientRect())
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const controls = useAnimation()
 
-  // launch animation
+  // animate each tile:
   useEffect(() => {
-    if (coords) {
-      controls.set({
-        visibility: 'visible',
-        x: tile.lastCoords.x - coords.x,
-        y: tile.lastCoords.y - coords.y,
-        width: 0,
-        height: 0,
-      })
-      controls.start({
-        x: 0,
-        y: 0,
-        width: coords.width,
-        height: coords.height,
-        transition: {
-          duration: 1,
-        },
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coords])
-
-  // save tile coords to use in animations
-  useEffect(() => {
-    if (coords) {
+    // now the tile is hidden
+    // read the current tile location to calculate transition x and y
+    const coords = ref.current.getBoundingClientRect()
+    // show the tile and move it back to the previous position
+    controls.set({
+      visibility: 'visible',
+      x: tile.lastCoords.x - coords.x,
+      y: tile.lastCoords.y - coords.y,
+    })
+    // animate tile from previous to current location
+    controls.start({
+      x: 0,
+      y: 0,
+      transition: {
+        duration: 0.3,
+      },
+    }).then(() => {
+      // after animation save tile new position to start from on the next animation
       const {
         x, y, width, height,
-      } = coords
-      // tile is at the stock
-      if (stock) {
-        dispatch(setGameStockCoords({
-          tile,
-          lastCoords: {
-            x, y, width, height,
-          },
-        }))
-      }
-    }
+      } = ref.current.getBoundingClientRect()
+      dispatch(setGameStockCoords({
+        tile,
+        lastCoords: {
+          x, y, width, height,
+        },
+      }))
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coords?.x, coords?.y])
+  }, [])
 
   const isHorizontal = () => {
     switch (tileStyle) {
