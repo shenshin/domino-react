@@ -46,3 +46,26 @@ export function insertTileToPlayline({
     playline.push(tile)
   }
 }
+
+export function moveTile({ from, to }) {
+  if (from.length > 0) {
+    to.push(from.splice(from.length - 1)[0])
+  }
+}
+
+export function dispatchConsequently(dispatch, {
+  action, steps, delay,
+}) {
+  let count = 0
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (count < steps) {
+        count += 1
+        dispatch(action())
+      } else {
+        clearInterval(interval)
+        resolve()
+      }
+    }, delay * 1000)
+  })
+}

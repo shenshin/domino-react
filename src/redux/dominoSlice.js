@@ -4,13 +4,8 @@ import {
   insertTileToPlayline,
   getEdges,
   getNumbers,
+  moveTile,
 } from '../util/tileOperations'
-
-function moveTile({ from, to }) {
-  if (from.length > 0) {
-    to.push(from.splice(from.length - 1)[0])
-  }
-}
 
 const initialState = {
   initialStock: [],
@@ -50,11 +45,11 @@ const dominoSlice = createSlice({
       }))
     },
 
-    setGameStockCoords: (state, { payload: { tile, lastCoords } }) => {
-      const tileInStock = state.stock.find((t) => t.id === tile.id)
-      if (tileInStock) {
-        tileInStock.lastCoords = lastCoords
-      }
+    setTileCoords: (state, { payload: { tile, lastCoords } }) => {
+      const stocks = [state.players[0].stock, state.players[1].stock, state.stock, state.playline];
+      const stock = stocks.find((s) => s.some((t) => t.id === tile.id))
+      const tileInStock = stock.find((t) => t.id === tile.id)
+      tileInStock.lastCoords = lastCoords
     },
 
     putTileToStock: (state) => moveTile({ from: state.initialStock, to: state.stock }),
@@ -106,15 +101,14 @@ const dominoSlice = createSlice({
 });
 
 export const {
-  restartGame,
-  putTileToStock,
-  setGameStockCoords,
+  aiMakesMove,
   drawTileToAI,
   drawTileToUser,
   drawTileToPlayline,
-
+  putTileToStock,
+  restartGame,
+  setTileCoords,
   userMakesMove,
-  aiMakesMove,
   userMissesMove,
 } = dominoSlice.actions
 export default dominoSlice.reducer

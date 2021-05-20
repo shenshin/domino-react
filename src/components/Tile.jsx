@@ -7,13 +7,14 @@ import { motion, useAnimation } from 'framer-motion'
 import {
   userMakesMove,
   aiMakesMove,
-  setGameStockCoords,
+  setTileCoords,
 } from '../redux/dominoSlice'
 import { startDrag, stopDrag } from '../redux/dragNdropSlice'
 import { getNumbers } from '../util/tileOperations'
 
 const DominoTile = styled(motion.div)`
-  margin: 2px;
+  margin: 1px;
+  visibility: hidden;
   font-size: ${({ size }) => (size === 'sm' ? css`2rem` : size === 'md' ? css`3.5rem` : css`5rem`)};
   ${({ draggable }) => draggable
     && css`
@@ -23,14 +24,18 @@ const DominoTile = styled(motion.div)`
     && css`
       color: lightgreen;
     `}
-  ${({ isVisible }) => !isVisible && css`visibility: hidden`};
 `;
 
 const Tile = ({
   tile = {
     id: '66',
     isRotated: false,
-    location: {},
+    lastCoords: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+    },
   },
   size = 'md',
   tileStyle = 'vertical',
@@ -70,7 +75,7 @@ const Tile = ({
       const {
         x, y, width, height,
       } = ref.current.getBoundingClientRect()
-      dispatch(setGameStockCoords({
+      dispatch(setTileCoords({
         tile,
         lastCoords: {
           x, y, width, height,
@@ -142,8 +147,6 @@ const Tile = ({
       onDragOver={handleDragOver}
       draggable={draggable}
       droppable={isDroppable()}
-      isHorizontal={isHorizontal()}
-      isVisible={stock}
     />
   )
 }

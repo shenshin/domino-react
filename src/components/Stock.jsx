@@ -9,23 +9,7 @@ import {
   drawTileToPlayline,
 } from '../redux/dominoSlice'
 import Container from './StockContainer'
-
-const dispatchConsequently = ({
-  dispatch, action, steps, delay,
-}) => {
-  let count = 0
-  return new Promise((resolve) => {
-    const interval = setInterval(() => {
-      if (count < steps) {
-        count += 1
-        dispatch(action())
-      } else {
-        clearInterval(interval)
-        resolve()
-      }
-    }, delay)
-  })
-}
+import { dispatchConsequently } from '../util/tileOperations'
 
 const Stock = () => {
   const dispatch = useDispatch()
@@ -33,24 +17,22 @@ const Stock = () => {
 
   useEffect(() => {
     (async () => {
+      const delay = 0.3
       dispatch(restartGame());
-      await dispatchConsequently({
-        dispatch,
+      await dispatchConsequently(dispatch, {
         action: putTileToStock,
         steps: 28,
-        delay: 300,
+        delay,
       })
-      await dispatchConsequently({
-        dispatch,
+      await dispatchConsequently(dispatch, {
         action: drawTileToAI,
         steps: 6,
-        delay: 1300,
+        delay,
       })
-      await dispatchConsequently({
-        dispatch,
+      await dispatchConsequently(dispatch, {
         action: drawTileToUser,
         steps: 6,
-        delay: 1300,
+        delay,
       })
       dispatch(drawTileToPlayline())
     })()

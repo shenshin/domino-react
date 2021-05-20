@@ -13,11 +13,8 @@ const tileSlice = createSlice({
     stopDrag: (state) => {
       state.draggedTile = null;
     },
-    setStockPosition: (state, { payload: { position } }) => {
-      state.stockPosition = position;
-    },
   },
 })
 
-export const { startDrag, stopDrag, setStockPosition } = tileSlice.actions
+export const { startDrag, stopDrag } = tileSlice.actions
 export default tileSlice.reducer
