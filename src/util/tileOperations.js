@@ -54,7 +54,7 @@ export function moveTile({ from, to }) {
 }
 
 export function dispatchConsequently(dispatch, {
-  action, steps, delay,
+  action, steps, interval: delay,
 }) {
   let count = 0
   return new Promise((resolve) => {

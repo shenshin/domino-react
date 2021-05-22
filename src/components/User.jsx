@@ -2,12 +2,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import Tile from './Tile'
 import {
   drawTileToUser,
+  drawTileToAI,
   userMissesMove,
   aiMakesMove,
 } from '../redux/dominoSlice'
 // import styled from 'styled-components';
 import StockContainer from './StockContainer'
-// import { dispatchConsequently } from '../util/tileOperations'
 
 const User = () => {
   const {
@@ -19,21 +19,12 @@ const User = () => {
   const handleDrawTile = () => {
     dispatch(drawTileToUser())
   }
-  // что-то не работает здесь
-  // нужно, чтобы они диспэтчились с паузами
   const handleMissMove = async () => {
-    /* await dispatchConsequently(dispatch, {
-      action: userMissesMove,
-      steps: 1,
-      delay: 0.5,
-    }) */
     dispatch(userMissesMove())
     dispatch(aiMakesMove())
-    /* await dispatchConsequently(dispatch, {
-      action: aiMakesMove,
-      steps: 1,
-      delay: 0.5,
-    }) */
+    setTimeout(() => {
+      dispatch(drawTileToAI())
+    }, 300)
   }
   return (
     <div>

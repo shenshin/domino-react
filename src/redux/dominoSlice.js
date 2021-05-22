@@ -61,17 +61,19 @@ const dominoSlice = createSlice({
       // find a player with matched tile
       const user = state.players[0]
       const playersTile = user.stock.find((t) => t.id === tile.id)
-      insertTileToPlayline({
-        playline: state.playline,
-        tile: playersTile,
-        position,
-      })
-      // remove matched tile from player's stock
-      user.stock = user.stock.filter((t) => t !== playersTile)
-      if (user.stock.length === 0) {
-        // game over
-        state.winner = user
-      } else moveTile({ from: state.stock, to: user.stock })
+      if (playersTile) {
+        insertTileToPlayline({
+          playline: state.playline,
+          tile: playersTile,
+          position,
+        })
+        // remove matched tile from player's stock
+        user.stock = user.stock.filter((t) => t !== playersTile)
+        if (user.stock.length === 0) {
+          // game over
+          state.winner = user
+        } else moveTile({ from: state.stock, to: user.stock })
+      }
     },
 
     userMissesMove: (state) => {
@@ -81,6 +83,7 @@ const dominoSlice = createSlice({
     aiMakesMove: (state) => {
       const ai = state.players[1];
       const playlineEdges = getEdges(state.playline)
+      // all tiles that match with one of the edges
       const matchingTiles = ai.stock.filter((t) => getNumbers(t)
         .some((n) => playlineEdges.includes(n)))
       if (matchingTiles.length > 0) {
@@ -92,7 +95,7 @@ const dominoSlice = createSlice({
         if (ai.stock.length === 0) {
           // game over
           state.winner = ai
-        } else moveTile({ from: state.stock, to: ai.stock })
+        }// else moveTile({ from: state.stock, to: ai.stock })
       } else {
         ai.missedLastMove += 1
       }

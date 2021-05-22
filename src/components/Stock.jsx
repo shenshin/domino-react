@@ -17,22 +17,22 @@ const Stock = () => {
 
   useEffect(() => {
     (async () => {
-      const delay = 0.3
+      const interval = 0.3
       dispatch(restartGame());
       await dispatchConsequently(dispatch, {
         action: putTileToStock,
         steps: 28,
-        delay,
+        interval: 0.2,
       })
       await dispatchConsequently(dispatch, {
         action: drawTileToAI,
         steps: 6,
-        delay,
+        interval,
       })
       await dispatchConsequently(dispatch, {
         action: drawTileToUser,
         steps: 6,
-        delay,
+        interval,
       })
       dispatch(drawTileToPlayline())
     })()
@@ -49,7 +49,7 @@ const Stock = () => {
               tile={tile}
               size="sm"
               color="textSecondary"
-              stock
+              duration={0.2}
             />
           ))}
         </Container>

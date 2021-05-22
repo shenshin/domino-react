@@ -9,14 +9,16 @@ import {
   aiMakesMove,
   setTileCoords,
 } from '../redux/dominoSlice'
-import { startDrag, stopDrag } from '../redux/dragNdropSlice'
+import {
+  startDrag, stopDrag, startDrop, stopDrop,
+} from '../redux/dragNdropSlice'
 import { getNumbers } from '../util/tileOperations'
 
 const DominoTile = styled(motion.div)`
   margin: 1px;
   visibility: hidden;
   font-size: ${({ size }) => (size === 'sm' ? css`2rem` : size === 'md' ? css`3.5rem` : css`5rem`)};
-  ${({ draggable }) => draggable
+  ${({ drag }) => drag
     && css`
       cursor: move;
     `}
@@ -42,48 +44,80 @@ const Tile = ({
   draggable = false,
   first = false,
   last = false,
-  stock = false,
+  duration = 0.3,
   // in order styled components to work
   className,
 }) => {
   const ref = useRef()
   const dispatch = useDispatch()
-  const { draggedTile } = useSelector((state) => state.dragNdrop)
+  const { draggedTile, droppedTile } = useSelector((state) => state.dragNdrop)
   const { winner } = useSelector((state) => state.domino)
   const controls = useAnimation()
 
   // animate each tile:
   useEffect(() => {
-    // now the tile is hidden
+    // on component mount the tile is hidden
     // read the current tile location to calculate transition x and y
-    const coords = ref.current.getBoundingClientRect()
+    const coords = ref?.current?.getBoundingClientRect?.()
     // show the tile and move it back to the previous position
     controls.set({
       visibility: 'visible',
-      x: tile.lastCoords.x - coords.x,
-      y: tile.lastCoords.y - coords.y,
+      x: tile.lastCoords.x - coords?.x ?? 0,
+      y: tile.lastCoords.y - coords?.y ?? 0,
     })
     // animate tile from previous to current location
     controls.start({
       x: 0,
       y: 0,
       transition: {
-        duration: 0.3,
+        duration,
       },
     }).then(() => {
       // after animation save tile new position to start from on the next animation
-      const {
-        x, y, width, height,
-      } = ref.current.getBoundingClientRect()
-      dispatch(setTileCoords({
-        tile,
-        lastCoords: {
+      const rect = ref?.current?.getBoundingClientRect?.()
+      if (rect) {
+        const {
           x, y, width, height,
-        },
-      }))
+        } = rect
+        dispatch(setTileCoords({
+          tile,
+          lastCoords: {
+            x,
+            y,
+            width,
+            height,
+          },
+        }))
+      }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // drop observer
+  useEffect(() => {
+    if (isDroppable(droppedTile)) {
+      // screen position of a droppable tile (in the playline)
+      const tileCoords = ref.current.getBoundingClientRect()
+      // center of a tile being dropped
+      const dropCenterX = droppedTile.lastCoords.x + droppedTile.lastCoords.width / 2
+      const dropCenterY = droppedTile.lastCoords.y + droppedTile.lastCoords.height / 2
+      // conditions met when droppable and dropped tile are close to each other
+      const tilesFitHorizontally = (dropCenterX >= tileCoords.x)
+      && (dropCenterX <= (tileCoords.x + tileCoords.width))
+      const tilesFitVertically = (dropCenterY >= tileCoords.y)
+      && (dropCenterY <= (tileCoords.y + tileCoords.height))
+      if (tilesFitHorizontally && tilesFitVertically) {
+        dispatch(userMakesMove({ tile: droppedTile, position: first }))
+        dispatch(stopDrop())
+        if (!winner) {
+          setTimeout(() => {
+            dispatch(aiMakesMove())
+          }, 1000)
+        }
+      }
+    }
+    // eslint-disable-next-line
+  }, [droppedTile])
 
   const isHorizontal = () => {
     switch (tileStyle) {
@@ -101,52 +135,45 @@ const Tile = ({
 
   // occurs on the draggable target when the user starts to drag an element
   const handleDragStart = () => {
-    dispatch(startDrag({ tile }))
+    dispatch(startDrag(tile))
   }
   // occurs on the draggable target when the user has finished dragging the element
   const handleDragEnd = () => {
     dispatch(stopDrag())
-  }
-
-  // occurs on the drop target when the dragged element is over the drop target
-  const handleDrop = () => {
-    dispatch(userMakesMove({ tile: draggedTile, position: first }))
-    dispatch(stopDrag())
-    if (!winner) {
-      setTimeout(() => {
-        dispatch(aiMakesMove())
-      }, 1000)
-    }
+    const {
+      x, y, width, height,
+    } = ref.current.getBoundingClientRect()
+    dispatch(startDrop({
+      ...tile,
+      lastCoords: {
+        x,
+        y,
+        width,
+        height,
+      },
+    }))
   }
 
   // filters appropriate tiles only
-  const isDroppable = () => draggedTile
-    && ((first
-      && last
-      && getNumbers(draggedTile).some((i) => getNumbers(tile).includes(i)))
-      || (first && getNumbers(draggedTile).includes(getNumbers(tile)[0]))
-      || (last && getNumbers(draggedTile).includes(getNumbers(tile)[1])))
-
-  // occurs on the drop target when the dragged element is over the drop target
-  const handleDragOver = (e) => {
-    if (isDroppable()) {
-      e.preventDefault()
-    }
-  };
+  const isDroppable = (movedTiled) => movedTiled && ((first
+    && last
+    && getNumbers(movedTiled).some((i) => getNumbers(tile).includes(i)))
+    || (first && getNumbers(movedTiled).includes(getNumbers(tile)[0]))
+    || (last && getNumbers(movedTiled).includes(getNumbers(tile)[1])))
 
   return (
     <DominoTile
-      animate={controls}
       className={className}
       size={size}
       ref={ref}
       dangerouslySetInnerHTML={{ __html: getHtml() }}
+      droppable={isDroppable(draggedTile)}
+      /* framer-motion props */
+      animate={controls}
+      drag={draggable}
+      dragMomentum={false}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      draggable={draggable}
-      droppable={isDroppable()}
     />
   )
 }
