@@ -8,19 +8,19 @@ import Container from './StockContainer'
 const AIPlayer = () => {
   const dispatch = useDispatch()
   const {
-    players: [, aiPlayer],
+    players: [, aiPlayer], winner,
   } = useSelector((state) => state.domino)
   // untill aiPlayer.missedLastMove is not 0, every 'delay'
   const delay = 600 // ms
   // milliseconds dispatch draw tile
   useEffect(() => {
-    if (aiPlayer?.missedLastMove > 0) {
+    if (aiPlayer?.missedLastMove > 0 && !winner) {
       setTimeout(() => {
         dispatch(drawTileToAI())
         dispatch(aiMakesMove())
       }, delay)
     }
-  }, [aiPlayer?.missedLastMove, dispatch])
+  }, [aiPlayer?.missedLastMove, winner])
   return (
     <div>
       {aiPlayer?.stock?.length > 0 ? (

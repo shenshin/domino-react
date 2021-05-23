@@ -8,6 +8,7 @@ import {
   userMakesMove,
   aiMakesMove,
   setTileCoords,
+  unsetUserTileCoords,
 } from '../redux/dominoSlice'
 import {
   startDrag, stopDrag, startDrop, stopDrop,
@@ -24,7 +25,7 @@ const DominoTile = styled(motion.div)`
     `}
   ${({ droppable }) => droppable
     && css`
-      color: lightgreen;
+      color: aquamarine;
     `}
 `;
 
@@ -51,46 +52,54 @@ const Tile = ({
   const ref = useRef()
   const dispatch = useDispatch()
   const { draggedTile, droppedTile } = useSelector((state) => state.dragNdrop)
-  const { winner } = useSelector((state) => state.domino)
   const controls = useAnimation()
 
-  // animate each tile:
+  // animate each tile after mount
   useEffect(() => {
-    // on component mount the tile is hidden
-    // read the current tile location to calculate transition x and y
-    const coords = ref?.current?.getBoundingClientRect?.()
-    // show the tile and move it back to the previous position
+    // show the tile since it was hidden before animatiom
     controls.set({
       visibility: 'visible',
-      x: tile.lastCoords.x - coords?.x ?? 0,
-      y: tile.lastCoords.y - coords?.y ?? 0,
     })
-    // animate tile from previous to current location
-    controls.start({
-      x: 0,
-      y: 0,
-      transition: {
-        duration,
-      },
-    }).then(() => {
-      // after animation save tile new position to start from on the next animation
-      const rect = ref?.current?.getBoundingClientRect?.()
-      if (rect) {
-        const {
-          x, y, width, height,
-        } = rect
-        dispatch(setTileCoords({
-          tile,
-          lastCoords: {
-            x,
-            y,
-            width,
-            height,
-          },
-        }))
-      }
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // animate if previous position was set
+    if (tile.lastCoords) {
+      // read the current tile location to calculate translation x and y
+      const coords = ref?.current?.getBoundingClientRect?.()
+      // move the tile back to it's unmounting position
+      controls.set({
+        x: tile.lastCoords.x - coords?.x ?? 0,
+        y: tile.lastCoords.y - coords?.y ?? 0,
+      })
+      // animate tile from previous to current location
+      controls.start({
+        x: 0,
+        y: 0,
+        transition: {
+          duration,
+        },
+      }).then(() => {
+        // if the tile is in the user's stock, disable future animations
+        if (draggable) {
+          dispatch(unsetUserTileCoords(tile))
+        } else {
+          // after animation save tile new position to start from on the next animation
+          const rect = ref?.current?.getBoundingClientRect?.()
+          if (rect) {
+            const {
+              x, y, width, height,
+            } = rect
+            dispatch(setTileCoords({
+              tile,
+              lastCoords: {
+                x,
+                y,
+                width,
+                height,
+              },
+            }))
+          }
+        }
+      })
+    }
   }, [])
 
   // drop observer
@@ -107,18 +116,20 @@ const Tile = ({
       const tilesFitVertically = (dropCenterY >= tileCoords.y)
       && (dropCenterY <= (tileCoords.y + tileCoords.height))
       if (tilesFitHorizontally && tilesFitVertically) {
-        dispatch(userMakesMove({ tile: droppedTile, position: first }))
-        dispatch(stopDrop())
-        if (!winner) {
-          setTimeout(() => {
-            dispatch(aiMakesMove())
-          }, 1000)
-        }
+        dispatchMoves()
       }
     }
-    // eslint-disable-next-line
   }, [droppedTile])
 
+  const dispatchMoves = () => {
+    dispatch(userMakesMove({ tile: droppedTile, position: first }))
+    dispatch(stopDrop())
+    setTimeout(() => {
+      dispatch(aiMakesMove())
+    }, 600)
+  }
+
+  // calculates tile orientation
   const isHorizontal = () => {
     switch (tileStyle) {
       case 'horizontal':

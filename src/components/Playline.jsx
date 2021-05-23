@@ -3,7 +3,7 @@ import Tile from './Tile'
 import Container from './StockContainer'
 
 const PlayLine = () => {
-  const playline = useSelector((state) => state.domino.playline)
+  const { playline } = useSelector((state) => state.domino)
   return (
     <div>
       <h5>Play Line</h5>

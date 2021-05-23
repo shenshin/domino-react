@@ -53,7 +53,7 @@ export function moveTile({ from, to }) {
   }
 }
 
-export function dispatchConsequently(dispatch, {
+export async function dispatchConsequently(dispatch, {
   action, steps, interval: delay,
 }) {
   let count = 0
