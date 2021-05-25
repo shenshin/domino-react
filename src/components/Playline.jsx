@@ -1,13 +1,19 @@
 import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 import Tile from './Tile'
-import Container from './StockContainer'
+import { StockContainer as SC, Title } from './styled'
+
+const StockContainer = styled(SC)`
+  margin-left: -0.75rem;
+`
 
 const PlayLine = () => {
   const { playline } = useSelector((state) => state.domino)
+
   return (
-    <div>
-      <h5>Play Line</h5>
-      <Container>
+    <>
+      <Title>Play Line</Title>
+      <StockContainer>
         {playline?.map((tile, i, a) => (
           <Tile
             tile={tile}
@@ -17,8 +23,8 @@ const PlayLine = () => {
             last={i === a.length - 1}
           />
         ))}
-      </Container>
-    </div>
+      </StockContainer>
+    </>
   )
 }
 

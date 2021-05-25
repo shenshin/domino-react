@@ -13,6 +13,7 @@ const initialState = {
   playline: [],
   players: [],
   winner: null,
+  firstInPlayline: null,
 };
 const dominoSlice = createSlice({
   name: 'domino',
@@ -20,6 +21,7 @@ const dominoSlice = createSlice({
   reducers: {
 
     restartGame: (state) => {
+      state.firstInPlayline = null
       state.winner = null;
       state.stock = [];
       state.playline = [];
@@ -41,7 +43,7 @@ const dominoSlice = createSlice({
       state.players = [1, 2].map((id) => ({
         id,
         missedLastMove: 0,
-        name: ['User', 'Artificial Intelligence'][id - 1],
+        name: ['Human', 'Artificial Intelligence'][id - 1],
         stock: [],
       }))
     },
@@ -65,7 +67,6 @@ const dominoSlice = createSlice({
 
     userMakesMove: (state, { payload: { tile, position } }) => {
       if (!state.winner) {
-        // find a player with matched tile
         const user = state.players[0]
         const playersTile = user.stock.find((t) => t.id === tile.id)
         if (playersTile) {
@@ -105,10 +106,17 @@ const dominoSlice = createSlice({
           // game over
             state.winner = ai
           }
+          // if the stock is empty and the rival missed previous move
+        } else if (!state.stock.length && state.players[0].missedLastMove) {
+          [state.winner] = [...state.players].sort((a, b) => a.stock.length - b.stock.length)
         } else {
           ai.missedLastMove += 1
         }
       }
+    },
+
+    setFirstInPlayline: (state, { payload }) => {
+      state.firstInPlayline = payload
     },
   },
 });
@@ -124,5 +132,6 @@ export const {
   unsetUserTileCoords,
   userMakesMove,
   userMissesMove,
+  setFirstInPlayline,
 } = dominoSlice.actions
 export default dominoSlice.reducer

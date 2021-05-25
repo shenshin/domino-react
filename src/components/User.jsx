@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import Tile from './Tile'
 import {
   drawTileToUser,
@@ -8,21 +8,31 @@ import {
   aiMakesMove,
   restartGame,
 } from '../redux/dominoSlice'
-import StockContainer from './StockContainer'
+import {
+  StockContainer as SC,
+  Title as T,
+  SubTitle,
+  Button,
+} from './styled'
 
-const Button = styled.button`
-  margin-top: 0.5rem;
+const StockContainer = styled(SC)`
+  
 `
-const Title = styled.p`
+const Title = styled(T)`
   text-transform: uppercase;
-  font-size: 1rem;
 `
-const SubTitle = styled.p`
-  font-size: 1rem;
-  ${({ lose }) => (lose
-    ? css`color: red;`
-    : css`color: aquamarine;`)}
+const Message = styled(SubTitle)`
+  font-weight: 200;
+  font-size: 0.9rem;
+  color: aquamarine;
 `
+const WinMessage = styled(Message)`
+  font-size: 1.3rem;
+`
+const LoseMessage = styled(WinMessage)`
+  color: red;
+`
+
 const User = () => {
   const {
     players: [user],
@@ -44,34 +54,36 @@ const User = () => {
     dispatch(restartGame())
   }
   return (
-    <div>
+    <>
       <Title>Your Stock</Title>
-      {!winner && (
-      <SubTitle>
-        Drop a tile and drag it to the Play Line
-      </SubTitle>
+      {!user?.stock?.length && (
+        <SubTitle>is empty</SubTitle>
       )}
-      {/* {winner && <h4>{`Game over! The winner today is ${winner?.name}`}</h4>} */}
+      {!winner && (
+      <Message>
+        Drag a tile and drop it to the Play Line
+      </Message>
+      )}
       <StockContainer>
         {user?.stock?.map((tile) => (
           <Tile key={tile.id} tile={tile} draggable={!winner} />
         ))}
       </StockContainer>
       {winner && (winner?.id === 1 ? (
-        <SubTitle>
+        <WinMessage>
           You Won! Great Victory! Restart to play again
-        </SubTitle>
+        </WinMessage>
       ) : (
-        <SubTitle lose>
+        <LoseMessage>
           You Lose. Restart to try again.
-        </SubTitle>
+        </LoseMessage>
       ))}
       <Button
         onClick={winner ? handleRestart : stock?.length > 0 ? handleDrawTile : handleMissMove}
       >
-        {winner ? 'Restart the Game' : stock?.length > 0 ? 'Draw a tile from the game stock' : 'Miss Move'}
+        {winner ? 'Restart Game' : stock?.length > 0 ? 'Draw Tile' : 'Miss Move'}
       </Button>
-    </div>
+    </>
   )
 }
 

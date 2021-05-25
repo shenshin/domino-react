@@ -9,6 +9,7 @@ import {
   aiMakesMove,
   setTileCoords,
   unsetUserTileCoords,
+  setFirstInPlayline,
 } from '../redux/dominoSlice'
 import {
   startDrag, stopDrag, startDrop, stopDrop,
@@ -18,15 +19,25 @@ import { getNumbers } from '../util/tileOperations'
 const DominoTile = styled(motion.div)`
   margin: 1px;
   visibility: hidden;
-  font-size: ${({ size }) => (size === 'sm' ? css`2rem` : size === 'md' ? css`3.5rem` : css`5rem`)};
-  ${({ drag }) => drag
-    && css`
-      cursor: move;
-    `}
-  ${({ droppable }) => droppable
-    && css`
-      color: aquamarine;
-    `}
+  font-size: ${({ size }) => (
+    size === 'sm'
+      ? css`2rem`
+      : size === 'md'
+        ? css`3.5rem`
+        : css`5rem`
+  )};
+  ${({ drag }) => (
+    drag && css`cursor: move;`
+  )}
+  color: ${({ variant }) => (
+    variant === 'selected'
+      ? css`#9ce0d5`
+      : variant === 'dimmed'
+        ? css`#7e7e7e`
+        : variant === 'droppable'
+          ? css`aquamarine`
+          : css`#b4b4b4`
+  )};
 `;
 
 const Tile = ({
@@ -45,62 +56,73 @@ const Tile = ({
   draggable = false,
   first = false,
   last = false,
+  faceDown = false,
   duration = 0.3,
+  variant = null,
   // in order styled components to work
   className,
 }) => {
   const ref = useRef()
   const dispatch = useDispatch()
   const { draggedTile, droppedTile } = useSelector((state) => state.dragNdrop)
+  const { firstInPlayline } = useSelector((state) => state.domino)
   const controls = useAnimation()
 
   // animate each tile after mount
   useEffect(() => {
-    // show the tile since it was hidden before animatiom
-    controls.set({
-      visibility: 'visible',
-    })
-    // animate if previous position was set
-    if (tile.lastCoords) {
+    if (ref?.current) {
+      // show the tile since it was hidden before animatiom
+      ref.current.style.visibility = 'visible'
+      // animate if previous position was set
+      if (tile.lastCoords) {
       // read the current tile location to calculate translation x and y
-      const coords = ref?.current?.getBoundingClientRect?.()
-      // move the tile back to it's unmounting position
-      controls.set({
-        x: tile.lastCoords.x - coords?.x ?? 0,
-        y: tile.lastCoords.y - coords?.y ?? 0,
-      })
-      // animate tile from previous to current location
-      controls.start({
-        x: 0,
-        y: 0,
-        transition: {
-          duration,
-        },
-      }).then(() => {
+        const coords = ref.current.getBoundingClientRect()
+        // move the tile back to it's unmounting position
+        controls.set({
+          x: tile.lastCoords.x - coords.x,
+          y: tile.lastCoords.y - coords.y,
+        })
+        // animate tile from previous to current location
+        controls.start({
+          x: 0,
+          y: 0,
+          transition: {
+            duration,
+            ease: 'easeOut',
+          },
+        }).then(() => {
         // if the tile is in the user's stock, disable future animations
-        if (draggable) {
-          dispatch(unsetUserTileCoords(tile))
-        } else {
+          if (draggable) {
+            dispatch(unsetUserTileCoords(tile))
+          } else {
           // after animation save tile new position to start from on the next animation
-          const rect = ref?.current?.getBoundingClientRect?.()
-          if (rect) {
-            const {
-              x, y, width, height,
-            } = rect
-            dispatch(setTileCoords({
-              tile,
-              lastCoords: {
-                x,
-                y,
-                width,
-                height,
-              },
-            }))
+            const rect = ref.current.getBoundingClientRect()
+            if (rect) {
+              const {
+                x, y, width, height,
+              } = rect
+              dispatch(setTileCoords({
+                tile,
+                lastCoords: {
+                  x,
+                  y,
+                  width,
+                  height,
+                },
+              }))
+            }
           }
-        }
-      })
+        })
+      }
     }
   }, [])
+
+  // mark first tile that was placed to the playline
+  useEffect(() => {
+    if (firstInPlayline === null && first) {
+      dispatch(setFirstInPlayline(tile))
+    }
+  }, [firstInPlayline])
 
   // drop observer
   useEffect(() => {
@@ -142,7 +164,7 @@ const Tile = ({
   }
 
   // gets html entity of the current tile
-  const getHtml = () => `&#${(isHorizontal() ? 127025 : 127075) + parseInt(getNumbers(tile).join(''), 7)};`
+  const getHtml = () => (faceDown ? (isHorizontal() ? '&#127024' : '&#127074') : `&#${(isHorizontal() ? 127025 : 127075) + parseInt(getNumbers(tile).join(''), 7)};`)
 
   // occurs on the draggable target when the user starts to drag an element
   const handleDragStart = () => {
@@ -172,19 +194,31 @@ const Tile = ({
     || (first && getNumbers(movedTiled).includes(getNumbers(tile)[0]))
     || (last && getNumbers(movedTiled).includes(getNumbers(tile)[1])))
 
+  // paint a tile with different colors depending on whether it's
+  // the first in the Playline or droppable or dimmed
+  const getVariant = () => (isDroppable(draggedTile) ? 'droppable' : tile.id === firstInPlayline?.id ? 'selected' : variant)
+
   return (
     <DominoTile
       className={className}
       size={size}
       ref={ref}
       dangerouslySetInnerHTML={{ __html: getHtml() }}
-      droppable={isDroppable(draggedTile)}
+      variant={getVariant()}
       /* framer-motion props */
       animate={controls}
       drag={draggable}
       dragMomentum={false}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      dragConstraints={{
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+      }}
+      dragElastic={1}
+      whileHover={draggable && { scale: 1.2 }}
     />
   )
 }

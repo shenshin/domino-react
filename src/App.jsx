@@ -1,14 +1,17 @@
-import User from './components/User'
-import AIPlayer from './components/AIPlayer'
-import Playline from './components/Playline'
-import Stock from './components/Stock'
+import {
+  User, AIPlayer, Playline, Stock, Header,
+} from './components'
+import { PageContainer } from './components/styled'
 
 const App = () => (
   <>
-    <Stock />
-    <AIPlayer />
-    <Playline />
-    <User />
+    <Header />
+    <PageContainer>
+      <Stock />
+      <AIPlayer />
+      <Playline />
+      <User />
+    </PageContainer>
   </>
 );
 

@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-// import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import Tile from './Tile'
 import { drawTileToAI, aiMakesMove } from '../redux/dominoSlice'
-import Container from './StockContainer'
+import { StockContainer, Title, SubTitle as ST } from './styled'
 
+const SubTitle = styled(ST)`
+  margin-bottom: 0.5rem;
+`
 const AIPlayer = () => {
   const dispatch = useDispatch()
   const {
@@ -22,23 +25,28 @@ const AIPlayer = () => {
     }
   }, [aiPlayer?.missedLastMove, winner])
   return (
-    <div>
+    <>
       {aiPlayer?.stock?.length > 0 ? (
-        <div>
-          <h6>Artificial Intelligence</h6>
-          {aiPlayer?.missedLastMove > 0 && (
-            <p>{`missed move ${aiPlayer?.missedLastMove}`}</p>
-          )}
-          <Container>
+        <>
+          <Title>Artificial Intelligence</Title>
+          <StockContainer>
             {aiPlayer?.stock?.map((tile) => (
-              <Tile key={tile.id} tile={tile} />
+              <Tile
+                key={tile.id}
+                tile={tile}
+                variant="dimmed"
+                faceDown
+              />
             ))}
-          </Container>
-        </div>
+          </StockContainer>
+        </>
       ) : (
-        <p>AI&apos;s stock is empty</p>
+        <>
+          <Title>AI&apos;s stock</Title>
+          <SubTitle>is empty</SubTitle>
+        </>
       )}
-    </div>
+    </>
   )
 }
 

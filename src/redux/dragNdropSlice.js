@@ -5,6 +5,7 @@ const tileSlice = createSlice({
   initialState: {
     draggedTile: null,
     droppedTile: null,
+    firstInPlayline: null,
   },
   reducers: {
     startDrag: (state, { payload }) => {

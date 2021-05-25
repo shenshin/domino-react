@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import styled from 'styled-components'
 import Tile from './Tile'
 import {
   restartGame,
@@ -8,8 +9,12 @@ import {
   drawTileToUser,
   drawTileToPlayline,
 } from '../redux/dominoSlice'
-import Container from './StockContainer'
+import { StockContainer, Title, SubTitle as ST } from './styled'
 import { dispatchConsequently } from '../util/tileOperations'
+
+const SubTitle = styled(ST)`
+  margin-bottom: 0.5rem;
+`
 
 const Stock = () => {
   const dispatch = useDispatch()
@@ -44,21 +49,22 @@ const Stock = () => {
 
   return (
     <div>
-      <h5>Game Stock</h5>
+      <Title>Game Stock</Title>
       {tiles?.length > 0 ? (
-        <Container>
-          {tiles?.map((tile, i) => (
+        <StockContainer>
+          {tiles?.map((tile) => (
             <Tile
               key={tile.id}
               tile={tile}
               size="sm"
               color="textSecondary"
               duration={0.4}
+              variant="dimmed"
             />
           ))}
-        </Container>
+        </StockContainer>
       ) : (
-        <h6>is empty</h6>
+        <SubTitle>is empty</SubTitle>
       )}
     </div>
   )
