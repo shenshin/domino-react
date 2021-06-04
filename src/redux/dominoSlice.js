@@ -62,7 +62,13 @@ const dominoSlice = createSlice({
 
     putTileToStock: (state) => moveTile({ from: state.initialStock, to: state.stock }),
     drawTileToAI: (state) => moveTile({ from: state.stock, to: state.players[1].stock }),
-    drawTileToPlayline: (state) => moveTile({ from: state.stock, to: state.playline }),
+    drawTileToPlayline: (state) => {
+      // remember first tile to indicate it in the playline
+      if (state.playline.length === 0) {
+        state.firstInPlayline = state.stock[state.stock.length - 1]
+      }
+      moveTile({ from: state.stock, to: state.playline })
+    },
     drawTileToUser: (state) => moveTile({ from: state.stock, to: state.players[0].stock }),
 
     userMakesMove: (state, { payload: { tile, position } }) => {
@@ -115,9 +121,9 @@ const dominoSlice = createSlice({
       }
     },
 
-    setFirstInPlayline: (state, { payload }) => {
+    /* setFirstInPlayline: (state, { payload }) => {
       state.firstInPlayline = payload
-    },
+    }, */
   },
 });
 

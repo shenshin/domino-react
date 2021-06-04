@@ -5,16 +5,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { motion, useAnimation } from 'framer-motion'
 import {
-  userMakesMove,
-  aiMakesMove,
   setTileCoords,
   unsetUserTileCoords,
-  setFirstInPlayline,
 } from '../redux/dominoSlice'
 import {
-  startDrag, stopDrag, startDrop, stopDrop,
+  startDrag, stopDrag, startDrop,
 } from '../redux/dragNdropSlice'
 import { getNumbers } from '../util/tileOperations'
+import DroppedPlaceholder from './DropPlaceholder'
 
 const DominoTile = styled(motion.div)`
   margin: 1px;
@@ -64,7 +62,6 @@ const Tile = ({
 }) => {
   const ref = useRef()
   const dispatch = useDispatch()
-  const { draggedTile, droppedTile } = useSelector((state) => state.dragNdrop)
   const { firstInPlayline } = useSelector((state) => state.domino)
   const controls = useAnimation()
 
@@ -117,40 +114,6 @@ const Tile = ({
     }
   }, [])
 
-  // mark first tile that was placed to the playline
-  useEffect(() => {
-    if (firstInPlayline === null && first) {
-      dispatch(setFirstInPlayline(tile))
-    }
-  }, [firstInPlayline])
-
-  // drop observer
-  useEffect(() => {
-    if (isDroppable(droppedTile)) {
-      // screen position of a droppable tile (in the playline)
-      const tileCoords = ref.current.getBoundingClientRect()
-      // center of a tile being dropped
-      const dropCenterX = droppedTile.lastCoords.x + droppedTile.lastCoords.width / 2
-      const dropCenterY = droppedTile.lastCoords.y + droppedTile.lastCoords.height / 2
-      // conditions met when droppable and dropped tile are close to each other
-      const tilesFitHorizontally = (dropCenterX >= tileCoords.x)
-      && (dropCenterX <= (tileCoords.x + tileCoords.width))
-      const tilesFitVertically = (dropCenterY >= tileCoords.y)
-      && (dropCenterY <= (tileCoords.y + tileCoords.height))
-      if (tilesFitHorizontally && tilesFitVertically) {
-        dispatchMoves()
-      }
-    }
-  }, [droppedTile])
-
-  const dispatchMoves = () => {
-    dispatch(userMakesMove({ tile: droppedTile, position: first }))
-    dispatch(stopDrop())
-    setTimeout(() => {
-      dispatch(aiMakesMove())
-    }, 600)
-  }
-
   // calculates tile orientation
   const isHorizontal = () => {
     switch (tileStyle) {
@@ -187,39 +150,39 @@ const Tile = ({
     }))
   }
 
-  // filters appropriate tiles only
-  const isDroppable = (movedTiled) => movedTiled && ((first
-    && last
-    && getNumbers(movedTiled).some((i) => getNumbers(tile).includes(i)))
-    || (first && getNumbers(movedTiled).includes(getNumbers(tile)[0]))
-    || (last && getNumbers(movedTiled).includes(getNumbers(tile)[1])))
-
-  // paint a tile with different colors depending on whether it's
-  // the first in the Playline or droppable or dimmed
-  const getVariant = () => (isDroppable(draggedTile) ? 'droppable' : tile.id === firstInPlayline?.id ? 'selected' : variant)
+  // paint a tile with different colors
+  const getVariant = () => (tile.id === firstInPlayline?.id ? 'selected' : variant)
 
   return (
-    <DominoTile
-      className={className}
-      size={size}
-      ref={ref}
-      dangerouslySetInnerHTML={{ __html: getHtml() }}
-      variant={getVariant()}
+    <>
+      {first && (
+      <DroppedPlaceholder tile={tile} first={first} last={last} isLeft />
+      )}
+      <DominoTile
+        className={className}
+        size={size}
+        ref={ref}
+        dangerouslySetInnerHTML={{ __html: getHtml() }}
+        variant={getVariant()}
       /* framer-motion props */
-      animate={controls}
-      drag={draggable}
-      dragMomentum={false}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      dragConstraints={{
-        left: 0,
-        top: 0,
-        right: 0,
-        bottom: 0,
-      }}
-      dragElastic={1}
-      whileHover={draggable && { scale: 1.2 }}
-    />
+        animate={controls}
+        drag={draggable}
+        dragMomentum={false}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        dragConstraints={{
+          left: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+        }}
+        dragElastic={1}
+        whileHover={draggable && { scale: 1.2 }}
+      />
+      {last && (
+      <DroppedPlaceholder tile={tile} first={first} last={last} />
+      )}
+    </>
   )
 }
 

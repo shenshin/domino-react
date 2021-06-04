@@ -5,6 +5,7 @@ import { StockContainer as SC, Title } from './styled'
 
 const StockContainer = styled(SC)`
   margin-left: -0.75rem;
+  
 `
 
 const PlayLine = () => {
