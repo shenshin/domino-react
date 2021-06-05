@@ -8,7 +8,7 @@ import { getNumbers } from '../util/tileOperations'
 const Container = styled.div`
   ${({ highLighted }) => (
     highLighted && css`
-    box-shadow: -1px -1px 10px aquamarine;
+    box-shadow: aquamarine 0px 0px 0px 1px inset;
   `
   )}
   border-radius: 2px;
@@ -21,20 +21,15 @@ const TileSymbol = styled.span`
 `
 
 const DropPlaceholder = ({
-  tile,
-  first = false,
-  last = false,
-  isLeft,
+  digit,
+  first = false, // false means this is a right (last) placeholder
 }) => {
   const ref = useRef()
   const dispatch = useDispatch()
   const { draggedTile, droppedTile } = useSelector((state) => state.dragNdrop)
 
-  const isDroppable = (movedTile) => movedTile && ((first
-    && last
-    && getNumbers(movedTile).some((i) => getNumbers(tile).includes(i)))
-    || (first && getNumbers(movedTile).includes(getNumbers(tile)[0]))
-    || (last && getNumbers(movedTile).includes(getNumbers(tile)[1])))
+  const isDroppable = (movedTile) => (movedTile
+    && (getNumbers(movedTile).includes(digit)))
 
   // drop observer
   useEffect(() => {
@@ -56,7 +51,10 @@ const DropPlaceholder = ({
   }, [droppedTile])
 
   const dispatchMoves = () => {
-    dispatch(userMakesMove({ tile: droppedTile, position: first }))
+    dispatch(userMakesMove({
+      tile: droppedTile,
+      position: first,
+    }))
     dispatch(stopDrop())
     setTimeout(() => {
       dispatch(aiMakesMove())

@@ -12,7 +12,7 @@ import {
   startDrag, stopDrag, startDrop,
 } from '../redux/dragNdropSlice'
 import { getNumbers } from '../util/tileOperations'
-import DroppedPlaceholder from './DropPlaceholder'
+import DropPlaceholder from './DropPlaceholder'
 
 const DominoTile = styled(motion.div)`
   margin: 1px;
@@ -156,7 +156,7 @@ const Tile = ({
   return (
     <>
       {first && (
-      <DroppedPlaceholder tile={tile} first={first} last={last} isLeft />
+      <DropPlaceholder digit={getNumbers(tile)[0]} first />
       )}
       <DominoTile
         className={className}
@@ -180,7 +180,7 @@ const Tile = ({
         whileHover={draggable && { scale: 1.2 }}
       />
       {last && (
-      <DroppedPlaceholder tile={tile} first={first} last={last} />
+      <DropPlaceholder digit={getNumbers(tile)[1]} />
       )}
     </>
   )

@@ -4,7 +4,7 @@ import Tile from './Tile'
 import { StockContainer as SC, Title } from './styled'
 
 const StockContainer = styled(SC)`
-  margin-left: -0.75rem;
+  margin-left: -0.5rem;
   
 `
 
