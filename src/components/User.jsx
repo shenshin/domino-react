@@ -49,7 +49,7 @@ const User = () => {
   }
   return (
     <>
-      <Title>{`Player: ${user.name}`}</Title>
+      <Title>{`Player: ${user?.name}`}</Title>
       {!user?.stock?.length && (
         <SubTitle>is empty</SubTitle>
       )}

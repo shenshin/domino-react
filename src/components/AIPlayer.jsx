@@ -28,7 +28,7 @@ const AIPlayer = () => {
     <>
       {aiPlayer?.stock?.length > 0 ? (
         <>
-          <Title>{`Player: ${aiPlayer.name}`}</Title>
+          <Title>{`Player: ${aiPlayer?.name}`}</Title>
           <StockContainer>
             {aiPlayer?.stock?.map((tile) => (
               <Tile
