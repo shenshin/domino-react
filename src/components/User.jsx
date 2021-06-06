@@ -51,7 +51,7 @@ const User = () => {
     <>
       <Title>{`Player: ${user?.name}`}</Title>
       {!user?.stock?.length && (
-        <SubTitle>is empty</SubTitle>
+        <SubTitle>Your stock is empty</SubTitle>
       )}
       {!winner && (
       <Message>
