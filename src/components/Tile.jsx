@@ -93,7 +93,7 @@ const Tile = ({
             dispatch(unsetUserTileCoords(tile))
           } else {
           // after animation save tile new position to start from on the next animation
-            const rect = ref.current.getBoundingClientRect()
+            const rect = ref?.current?.getBoundingClientRect()
             if (rect) {
               const {
                 x, y, width, height,
