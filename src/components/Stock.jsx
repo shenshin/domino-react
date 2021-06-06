@@ -7,7 +7,7 @@ import {
   putTileToStock,
   drawTileToAI,
   drawTileToUser,
-  drawTileToPlayline,
+  drawFirstTileToPlayline,
 } from '../redux/dominoSlice'
 import { StockContainer, Title, SubTitle as ST } from './styled'
 import { dispatchConsequently } from '../util/tileOperations'
@@ -42,7 +42,7 @@ const Stock = () => {
           steps: 6,
           interval,
         })
-        dispatch(drawTileToPlayline())
+        dispatch(drawFirstTileToPlayline())
       })()
     }
   }, [winner])

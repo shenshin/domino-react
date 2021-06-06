@@ -9,18 +9,12 @@ import {
   restartGame,
 } from '../redux/dominoSlice'
 import {
-  StockContainer as SC,
-  Title as T,
+  StockContainer,
+  Title,
   SubTitle,
   Button,
 } from './styled'
 
-const StockContainer = styled(SC)`
-  
-`
-const Title = styled(T)`
-  text-transform: uppercase;
-`
 const Message = styled(SubTitle)`
   font-weight: 200;
   font-size: 0.9rem;
@@ -55,7 +49,7 @@ const User = () => {
   }
   return (
     <>
-      <Title>Your Stock</Title>
+      <Title>{`Player: ${user.name}`}</Title>
       {!user?.stock?.length && (
         <SubTitle>is empty</SubTitle>
       )}

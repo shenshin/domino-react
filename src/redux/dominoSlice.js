@@ -13,7 +13,16 @@ const initialState = {
   playline: [],
   players: [],
   winner: null,
-  firstInPlayline: null,
+  firstInPlayline: {
+    id: '11',
+    isRotated: false,
+    lastCoords: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+    },
+  },
 };
 const dominoSlice = createSlice({
   name: 'domino',
@@ -21,7 +30,6 @@ const dominoSlice = createSlice({
   reducers: {
 
     restartGame: (state) => {
-      state.firstInPlayline = null
       state.winner = null;
       state.stock = [];
       state.playline = [];
@@ -37,7 +45,7 @@ const dominoSlice = createSlice({
           width: 0,
           height: 0,
         },
-      }))
+      })).filter((tile) => tile.id !== state.firstInPlayline.id)
       shuffle(state.initialStock)
       // create players
       state.players = [1, 2].map((id) => ({
@@ -62,12 +70,8 @@ const dominoSlice = createSlice({
 
     putTileToStock: (state) => moveTile({ from: state.initialStock, to: state.stock }),
     drawTileToAI: (state) => moveTile({ from: state.stock, to: state.players[1].stock }),
-    drawTileToPlayline: (state) => {
-      // remember first tile to indicate it in the playline
-      if (state.playline.length === 0) {
-        state.firstInPlayline = state.stock[state.stock.length - 1]
-      }
-      moveTile({ from: state.stock, to: state.playline })
+    drawFirstTileToPlayline: (state) => {
+      state.playline.push(state.firstInPlayline)
     },
     drawTileToUser: (state) => moveTile({ from: state.stock, to: state.players[0].stock }),
 
@@ -120,10 +124,6 @@ const dominoSlice = createSlice({
         }
       }
     },
-
-    /* setFirstInPlayline: (state, { payload }) => {
-      state.firstInPlayline = payload
-    }, */
   },
 });
 
@@ -131,7 +131,7 @@ export const {
   aiMakesMove,
   drawTileToAI,
   drawTileToUser,
-  drawTileToPlayline,
+  drawFirstTileToPlayline,
   putTileToStock,
   restartGame,
   setTileCoords,
